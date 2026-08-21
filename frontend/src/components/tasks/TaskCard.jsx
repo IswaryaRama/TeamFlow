@@ -12,11 +12,12 @@ import {
   Eye
 } from 'lucide-react';
 
-export default function TaskCard({ task, onClick, onHistoryClick }) {
+export default function TaskCard({ task, projectName, onClick, onHistoryClick }) {
   const { user, isAdmin } = useAuth();
 
   const isAssignedToMe = task.assigned_to_id === user?.id;
   const isReadOnly = !isAdmin && !isAssignedToMe;
+  const projectTitle = projectName || task.project_title || task.project?.title;
 
   const parseDate = (iso) => {
     if (!iso) return null;
@@ -51,6 +52,16 @@ export default function TaskCard({ task, onClick, onHistoryClick }) {
       }`}
     >
       <div className="space-y-2">
+        {/* Project Tag */}
+        {projectTitle && (
+          <div className="flex items-center">
+            <span className="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-violet-50 text-violet-700 border border-violet-200/80 truncate max-w-full">
+              <FolderKanban className="w-3 h-3 text-violet-600 flex-shrink-0" />
+              <span className="truncate">{projectTitle}</span>
+            </span>
+          </div>
+        )}
+
         {/* Top Badges */}
         <div className="flex items-center justify-between gap-1">
           <div className="flex items-center space-x-1.5 flex-wrap">

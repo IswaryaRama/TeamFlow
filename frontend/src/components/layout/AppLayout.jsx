@@ -8,10 +8,10 @@ export default function AppLayout({ children }) {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full animate-fadeIn">
         {children}
       </main>
-      <footer className="border-t border-white/5 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
-          <span>TeamFlow &bull; Enterprise Project & Task Management</span>
-          <span>FastAPI &bull; PostgreSQL &bull; React &bull; Tailwind CSS &bull; JWT RBAC</span>
+      <footer className="border-t border-purple-100/60 py-6 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-2">
+          <span>© {new Date().getFullYear()} TeamFlow. All rights reserved.</span>
+          <span>Built for high-velocity productive teams.</span>
         </div>
       </footer>
     </div>

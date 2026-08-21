@@ -55,8 +55,8 @@ export default function TasksPage() {
         projectService.getProjects(),
         userService.getUserSummaries(),
       ]);
-      setProjects(projs);
-      setUsers(userSummaries);
+      setProjects(projs || []);
+      setUsers(userSummaries || []);
     } catch (err) {
       console.error('Error fetching filter options:', err);
     }
@@ -68,7 +68,7 @@ export default function TasksPage() {
     setError(null);
     try {
       const data = await taskService.getTasks();
-      setTasks(data);
+      setTasks(data || []);
     } catch (err) {
       setError('Failed to load tasks');
     } finally {
@@ -76,10 +76,14 @@ export default function TasksPage() {
     }
   };
 
-  const myTasksCount = tasks.filter((t) => t.assigned_to_id === user?.id).length;
+  const myTasksCount = (tasks || []).filter((t) => t.assigned_to_id === user?.id).length;
+
+  const projectMap = React.useMemo(() => {
+    return Object.fromEntries((projects || []).map((p) => [p.id, p]));
+  }, [projects]);
 
   // Client-side filtering logic
-  const filteredTasks = tasks.filter((t) => {
+  const filteredTasks = (tasks || []).filter((t) => {
     const matchesSearch =
       t.title.toLowerCase().includes(search.toLowerCase()) ||
       (t.description && t.description.toLowerCase().includes(search.toLowerCase()));
@@ -117,7 +121,7 @@ export default function TasksPage() {
               Task Workflows
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-1">
-              Tasks & Kanban Board
+              Interactive Task Board
             </h1>
             <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
               Filter tasks by project, priority, and status. Review and modify deadlines with full audit trail.
@@ -133,7 +137,7 @@ export default function TasksPage() {
                 className={`p-1.5 rounded-lg transition cursor-pointer ${
                   viewMode === 'board' ? 'bg-purple-100 text-purple-800 font-bold' : 'text-slate-500 hover:text-slate-800'
                 }`}
-                title="Kanban Board View"
+                title="Board View"
               >
                 <LayoutGrid className="w-4 h-4" />
               </button>
@@ -203,7 +207,7 @@ export default function TasksPage() {
           </div>
         )}
 
-        {/* Filter Toolbar */}
+        {/* Filters and Search Bar */}
         <div className="glass-card p-4 rounded-2xl border border-purple-100 space-y-3 shadow-xs">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {/* Search Input */}
@@ -269,7 +273,7 @@ export default function TasksPage() {
           </div>
         )}
 
-        {/* ===================== KANBAN BOARD VIEW ===================== */}
+        {/* ===================== BOARD VIEW ===================== */}
         {!loading && !error && viewMode === 'board' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-start">
             {columns.map((col) => {
@@ -298,6 +302,7 @@ export default function TasksPage() {
                         <TaskCard
                           key={t.id}
                           task={t}
+                          projectName={projectMap[t.project_id]?.title}
                           onClick={() => {
                             setSelectedTaskId(t.id);
                             setIsTaskDetailOpen(true);
@@ -321,6 +326,7 @@ export default function TasksPage() {
                 <thead>
                   <tr className="border-b border-purple-100 bg-purple-50/50 text-slate-600 font-bold uppercase tracking-wider">
                     <th className="py-3 px-4">Title</th>
+                    <th className="py-3 px-4">Project</th>
                     <th className="py-3 px-4">Status</th>
                     <th className="py-3 px-4">Priority</th>
                     <th className="py-3 px-4">Assignee</th>
@@ -331,7 +337,7 @@ export default function TasksPage() {
                 <tbody className="divide-y divide-purple-50">
                   {filteredTasks.length === 0 ? (
                     <tr>
-                      <td colSpan="6" className="py-12 text-center text-slate-500 font-medium">
+                      <td colSpan="7" className="py-12 text-center text-slate-500 font-medium">
                         No tasks found matching criteria.
                       </td>
                     </tr>
@@ -361,6 +367,12 @@ export default function TasksPage() {
                           )}
                         </td>
                         <td className="py-3 px-4">
+                          <span className="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-violet-50 text-violet-700 border border-violet-200">
+                            <FolderKanban className="w-3 h-3 text-violet-600" />
+                            <span>{projectMap[t.project_id]?.title || 'General Project'}</span>
+                          </span>
+                        </td>
+                        <td className="py-3 px-4">
                           <StatusBadge status={t.status} />
                         </td>
                         <td className="py-3 px-4">
@@ -388,13 +400,13 @@ export default function TasksPage() {
                                 e.stopPropagation();
                                 setHistoryTask(t);
                               }}
-                              className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-lg bg-purple-100 text-purple-800 border border-purple-200 text-[11px] font-bold cursor-pointer"
+                              className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 transition"
                             >
                               <History className="w-3 h-3" />
                               <span>{t.deadline_history_count} logs</span>
                             </button>
                           ) : (
-                            <span className="text-slate-400 text-[11px]">-</span>
+                            <span className="text-slate-400 text-[11px]">—</span>
                           )}
                         </td>
                       </tr>
@@ -405,29 +417,44 @@ export default function TasksPage() {
             </div>
           </div>
         )}
+
+        {/* Task Creation Modal */}
+        {isCreateTaskOpen && (
+          <TaskModal
+            isOpen={isCreateTaskOpen}
+            onClose={() => setIsCreateTaskOpen(false)}
+            onTaskCreated={() => {
+              loadTasks();
+              setIsCreateTaskOpen(false);
+            }}
+            projects={projects}
+            users={users}
+          />
+        )}
+
+        {/* Task Detail / Edit Modal */}
+        {isTaskDetailOpen && selectedTaskId && (
+          <TaskDetailModal
+            isOpen={isTaskDetailOpen}
+            onClose={() => {
+              setIsTaskDetailOpen(false);
+              setSelectedTaskId(null);
+            }}
+            taskId={selectedTaskId}
+            onTaskUpdated={() => loadTasks()}
+          />
+        )}
+
+        {/* Deadline History Audit Modal */}
+        {historyTask && (
+          <DeadlineHistoryModal
+            isOpen={!!historyTask}
+            onClose={() => setHistoryTask(null)}
+            taskId={historyTask.id}
+            taskTitle={historyTask.title}
+          />
+        )}
       </div>
-
-      {/* Task Creation Modal */}
-      <TaskModal
-        isOpen={isCreateTaskOpen}
-        onClose={() => setIsCreateTaskOpen(false)}
-        onTaskCreated={() => loadTasks()}
-      />
-
-      {/* Task Detail Modal */}
-      <TaskDetailModal
-        isOpen={isTaskDetailOpen}
-        onClose={() => setIsTaskDetailOpen(false)}
-        taskId={selectedTaskId}
-        onTaskUpdated={() => loadTasks()}
-      />
-
-      {/* Deadline History Modal */}
-      <DeadlineHistoryModal
-        isOpen={!!historyTask}
-        onClose={() => setHistoryTask(null)}
-        task={historyTask}
-      />
     </AppLayout>
   );
 }

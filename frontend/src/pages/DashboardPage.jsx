@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { dashboardService } from '../services/dashboardService';
 import AppLayout from '../components/layout/AppLayout';
@@ -27,6 +28,7 @@ import {
 
 export default function DashboardPage() {
   const { user, isAdmin } = useAuth();
+  const navigate = useNavigate();
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -65,54 +67,60 @@ export default function DashboardPage() {
     setIsTaskDetailOpen(true);
   };
 
-  const handleOpenHistory = (taskObj) => {
-    setHistoryTask(taskObj);
+  const handleOpenHistory = (task) => {
+    setHistoryTask(task);
   };
 
   return (
     <AppLayout>
-      <div className="space-y-8">
+      <div className="space-y-8 animate-fadeIn">
         {/* Welcome Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-purple-100">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-purple-100">
           <div>
             <div className="flex items-center space-x-2">
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-purple-100 text-purple-800 border border-purple-200">
-                Workspace Overview
-              </span>
               <RoleBadge role={user?.role} />
+              <span className="text-xs font-semibold text-slate-500">Welcome Back</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-1.5 font-sans">
-              Welcome, {user?.full_name}
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-1">
+              {user?.full_name || 'TeamFlow User'}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
               {isAdmin
-                ? 'Manage projects, coordinate team assignments, and audit task deadlines.'
-                : 'Track your assigned tasks, update statuses, and log your progress updates.'}
+                ? 'Overview of organization workspaces, projects, task velocity, and team metrics.'
+                : 'Your active workload, assigned project boards, and pending task milestones.'}
             </p>
           </div>
 
-          {/* Quick Action Buttons for Admin */}
-          {isAdmin && (
-            <div className="flex items-center space-x-3">
-              <button
-                type="button"
-                onClick={() => setIsProjectModalOpen(true)}
-                className="flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-white hover:bg-purple-50/50 text-slate-700 text-xs font-semibold border border-purple-200 shadow-xs transition cursor-pointer"
+          <div className="flex items-center space-x-3">
+            {isAdmin ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setIsProjectModalOpen(true)}
+                  className="btn-secondary flex items-center space-x-2 py-2 px-3 text-xs shadow-xs"
+                >
+                  <Plus className="w-4 h-4 text-purple-600" />
+                  <span>New Project</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsTaskModalOpen(true)}
+                  className="btn-primary flex items-center space-x-2 py-2 px-4 text-xs shadow-md shadow-purple-500/20"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Create Task</span>
+                </button>
+              </>
+            ) : (
+              <a
+                href="/tasks"
+                className="btn-primary flex items-center space-x-2 py-2 px-4 text-xs shadow-md shadow-purple-500/20"
               >
-                <Plus className="w-3.5 h-3.5 text-slate-500" />
-                <span>New Project</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setIsTaskModalOpen(true)}
-                className="flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-semibold shadow-md shadow-purple-500/20 transition cursor-pointer"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Create Task</span>
-              </button>
-            </div>
-          )}
+                <CheckSquare className="w-4 h-4" />
+                <span>Go to Task Board</span>
+              </a>
+            )}
+          </div>
         </div>
 
         {/* Loading Spinner */}
@@ -134,58 +142,86 @@ export default function DashboardPage() {
         {/* ===================== ADMIN DASHBOARD ===================== */}
         {!loading && metrics && isAdmin && (
           <div className="space-y-8">
-            {/* Top Stat Cards */}
+            {/* Top Stat Cards - Now Clickable Links */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {/* Active Projects */}
-              <div className="stat-card-violet p-5 rounded-2xl flex items-center justify-between shadow-xs hover:shadow-sm transition">
+              <Link
+                to="/projects"
+                className="stat-card-violet p-5 rounded-2xl flex items-center justify-between shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer border border-purple-200/60 hover:border-purple-400"
+                title="View All Projects"
+              >
                 <div className="space-y-1">
-                  <span className="text-xs font-semibold text-purple-800 uppercase tracking-wider">Active Projects</span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-semibold text-purple-800 uppercase tracking-wider group-hover:text-purple-950">Active Projects</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-purple-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                  </div>
                   <div className="text-3xl font-bold text-purple-950 tracking-tight">{metrics.summary?.total_projects || 0}</div>
                   <span className="text-[11px] text-purple-700 font-medium flex items-center gap-1">
                     <span className="w-2 h-2 rounded-full bg-purple-500" />
                     Active Workspaces
                   </span>
                 </div>
-                <div className="w-12 h-12 rounded-xl bg-purple-100 text-purple-700 border border-purple-200 flex items-center justify-center shadow-xs">
+                <div className="w-12 h-12 rounded-xl bg-purple-100 text-purple-700 border border-purple-200 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
                   <FolderKanban className="w-6 h-6" />
                 </div>
-              </div>
+              </Link>
 
               {/* Total Tasks */}
-              <div className="stat-card-indigo p-5 rounded-2xl flex items-center justify-between shadow-xs hover:shadow-sm transition">
+              <Link
+                to="/tasks"
+                className="stat-card-indigo p-5 rounded-2xl flex items-center justify-between shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer border border-indigo-200/60 hover:border-indigo-400"
+                title="Open Interactive Task Board"
+              >
                 <div className="space-y-1">
-                  <span className="text-xs font-semibold text-indigo-800 uppercase tracking-wider">Total Tasks</span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-semibold text-indigo-800 uppercase tracking-wider group-hover:text-indigo-950">Total Tasks</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-indigo-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                  </div>
                   <div className="text-3xl font-bold text-indigo-950 tracking-tight">{metrics.summary?.total_tasks || 0}</div>
                   <span className="text-[11px] text-indigo-700 font-medium">{metrics.summary?.completed_tasks || 0} completed</span>
                 </div>
-                <div className="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-700 border border-indigo-200 flex items-center justify-center shadow-xs">
+                <div className="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-700 border border-indigo-200 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
                   <CheckSquare className="w-6 h-6" />
                 </div>
-              </div>
+              </Link>
 
               {/* Completion Rate */}
-              <div className="stat-card-teal p-5 rounded-2xl flex items-center justify-between shadow-xs hover:shadow-sm transition">
+              <Link
+                to="/tasks"
+                className="stat-card-teal p-5 rounded-2xl flex items-center justify-between shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer border border-teal-200/60 hover:border-teal-400"
+                title="View Task Completion Velocity"
+              >
                 <div className="space-y-1">
-                  <span className="text-xs font-semibold text-teal-800 uppercase tracking-wider">Completion Rate</span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-semibold text-teal-800 uppercase tracking-wider group-hover:text-teal-950">Completion Rate</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-teal-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                  </div>
                   <div className="text-3xl font-bold text-teal-950 tracking-tight">{metrics.summary?.completion_rate || 0}%</div>
                   <span className="text-[11px] text-teal-700 font-medium">Overall Velocity</span>
                 </div>
-                <div className="w-12 h-12 rounded-xl bg-teal-100 text-teal-700 border border-teal-200 flex items-center justify-center shadow-xs">
+                <div className="w-12 h-12 rounded-xl bg-teal-100 text-teal-700 border border-teal-200 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
                   <TrendingUp className="w-6 h-6" />
                 </div>
-              </div>
+              </Link>
 
               {/* Overdue Tasks */}
-              <div className="stat-card-rose p-5 rounded-2xl flex items-center justify-between shadow-xs hover:shadow-sm transition">
+              <Link
+                to="/tasks"
+                className="stat-card-rose p-5 rounded-2xl flex items-center justify-between shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer border border-rose-200/60 hover:border-rose-400"
+                title="Review Overdue Tasks"
+              >
                 <div className="space-y-1">
-                  <span className="text-xs font-semibold text-rose-800 uppercase tracking-wider">Overdue Tasks</span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-semibold text-rose-800 uppercase tracking-wider group-hover:text-rose-950">Overdue Tasks</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-rose-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                  </div>
                   <div className="text-3xl font-bold text-rose-950 tracking-tight">{metrics.summary?.overdue_tasks || 0}</div>
                   <span className="text-[11px] text-rose-700 font-medium">Attention Needed</span>
                 </div>
-                <div className="w-12 h-12 rounded-xl bg-rose-100 text-rose-700 border border-rose-200 flex items-center justify-center shadow-xs">
+                <div className="w-12 h-12 rounded-xl bg-rose-100 text-rose-700 border border-rose-200 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
                   <AlertTriangle className="w-6 h-6" />
                 </div>
-              </div>
+              </Link>
             </div>
 
             {/* Recent Projects with Progress */}
@@ -273,51 +309,79 @@ export default function DashboardPage() {
         {/* ===================== TEAM MEMBER DASHBOARD ===================== */}
         {!loading && metrics && !isAdmin && (
           <div className="space-y-8">
-            {/* Member Stats Cards */}
+            {/* Member Stats Cards - Clickable Links */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              <div className="stat-card-violet p-5 rounded-2xl flex items-center justify-between shadow-xs">
+              <Link
+                to="/tasks"
+                className="stat-card-violet p-5 rounded-2xl flex items-center justify-between shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer border border-purple-200/60 hover:border-purple-400"
+                title="Open My Assigned Tasks"
+              >
                 <div className="space-y-1">
-                  <span className="text-xs font-semibold text-purple-800 uppercase tracking-wider">My Assigned Tasks</span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-semibold text-purple-800 uppercase tracking-wider group-hover:text-purple-950">My Assigned Tasks</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-purple-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                  </div>
                   <div className="text-3xl font-bold text-purple-950 tracking-tight">{metrics.summary?.total_assigned || 0}</div>
                   <span className="text-[11px] text-purple-700 font-medium">Total Workload</span>
                 </div>
-                <div className="w-12 h-12 rounded-xl bg-purple-100 text-purple-700 border border-purple-200 flex items-center justify-center shadow-xs">
+                <div className="w-12 h-12 rounded-xl bg-purple-100 text-purple-700 border border-purple-200 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
                   <CheckSquare className="w-6 h-6" />
                 </div>
-              </div>
+              </Link>
 
-              <div className="stat-card-indigo p-5 rounded-2xl flex items-center justify-between shadow-xs">
+              <Link
+                to="/tasks"
+                className="stat-card-indigo p-5 rounded-2xl flex items-center justify-between shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer border border-indigo-200/60 hover:border-indigo-400"
+                title="View In Progress Tasks"
+              >
                 <div className="space-y-1">
-                  <span className="text-xs font-semibold text-indigo-800 uppercase tracking-wider">In Progress</span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-semibold text-indigo-800 uppercase tracking-wider group-hover:text-indigo-950">In Progress</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-indigo-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                  </div>
                   <div className="text-3xl font-bold text-indigo-950 tracking-tight">{metrics.summary?.in_progress_tasks || 0}</div>
                   <span className="text-[11px] text-indigo-700 font-medium">Active Tasks</span>
                 </div>
-                <div className="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-700 border border-indigo-200 flex items-center justify-center shadow-xs">
+                <div className="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-700 border border-indigo-200 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
                   <Clock className="w-6 h-6" />
                 </div>
-              </div>
+              </Link>
 
-              <div className="stat-card-teal p-5 rounded-2xl flex items-center justify-between shadow-xs">
+              <Link
+                to="/tasks"
+                className="stat-card-teal p-5 rounded-2xl flex items-center justify-between shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer border border-teal-200/60 hover:border-teal-400"
+                title="View Completed Tasks"
+              >
                 <div className="space-y-1">
-                  <span className="text-xs font-semibold text-teal-800 uppercase tracking-wider">Completed</span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-semibold text-teal-800 uppercase tracking-wider group-hover:text-teal-950">Completed</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-teal-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                  </div>
                   <div className="text-3xl font-bold text-teal-950 tracking-tight">{metrics.summary?.completed_tasks || 0}</div>
                   <span className="text-[11px] text-teal-700 font-medium">{metrics.summary?.completion_rate || 0}% Completed</span>
                 </div>
-                <div className="w-12 h-12 rounded-xl bg-teal-100 text-teal-700 border border-teal-200 flex items-center justify-center shadow-xs">
+                <div className="w-12 h-12 rounded-xl bg-teal-100 text-teal-700 border border-teal-200 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
-              </div>
+              </Link>
 
-              <div className="stat-card-rose p-5 rounded-2xl flex items-center justify-between shadow-xs">
+              <Link
+                to="/tasks"
+                className="stat-card-rose p-5 rounded-2xl flex items-center justify-between shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group cursor-pointer border border-rose-200/60 hover:border-rose-400"
+                title="Review Overdue Tasks"
+              >
                 <div className="space-y-1">
-                  <span className="text-xs font-semibold text-rose-800 uppercase tracking-wider">Overdue Tasks</span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-semibold text-rose-800 uppercase tracking-wider group-hover:text-rose-950">Overdue Tasks</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-rose-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                  </div>
                   <div className="text-3xl font-bold text-rose-950 tracking-tight">{metrics.summary?.overdue_tasks || 0}</div>
                   <span className="text-[11px] text-rose-700 font-medium">Attention Needed</span>
                 </div>
-                <div className="w-12 h-12 rounded-xl bg-rose-100 text-rose-700 border border-rose-200 flex items-center justify-center shadow-xs">
+                <div className="w-12 h-12 rounded-xl bg-rose-100 text-rose-700 border border-rose-200 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
                   <AlertTriangle className="w-6 h-6" />
                 </div>
-              </div>
+              </Link>
             </div>
 
             {/* My Active Tasks Grid */}
@@ -339,14 +403,20 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {metrics.my_tasks?.map((t) => (
-                    <TaskCard
-                      key={t.id}
-                      task={t}
-                      onClick={() => handleOpenTask(t.id)}
-                      onHistoryClick={(tObj) => handleOpenHistory(tObj)}
-                    />
-                  ))}
+                  {metrics.my_tasks?.map((t) => {
+                    const projTitle = metrics.projects?.find((p) => p.id === t.project_id)?.title ||
+                                     metrics.my_projects?.find((p) => p.id === t.project_id)?.title ||
+                                     t.project_title;
+                    return (
+                      <TaskCard
+                        key={t.id}
+                        task={t}
+                        projectName={projTitle}
+                        onClick={() => handleOpenTask(t.id)}
+                        onHistoryClick={(tObj) => handleOpenHistory(tObj)}
+                      />
+                    );
+                  })}
                 </div>
               )}
             </div>
