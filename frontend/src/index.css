@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-main: #FAF5FF;
+    --primary: #7C3AED;
+    --secondary: #6B7280;
+    --accent: #A855F7;
+    --text-primary: #1E1B4B;
+    --text-secondary: #6B7280;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    background-color: #FAF5FF;
+    color: #1E1B4B;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+    color: #1E1B4B;
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid #E9D5FF;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px -2px rgba(124, 58, 237, 0.05);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .glass-card-hover:hover {
+    background: #FFFFFF;
+    border-color: #A855F7;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -4px rgba(124, 58, 237, 0.12);
+  }
+
+  .kanban-column {
+    background: #FFFFFF;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 18px;
+    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.04);
+  }
+
+  .stat-card-violet {
+    background: linear-gradient(135deg, rgba(250, 245, 255, 0.95) 0%, rgba(243, 232, 255, 0.7) 100%) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(233, 213, 255, 0.9) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 32px rgba(124, 58, 237, 0.06) !important;
+  }
+
+  .stat-card-indigo {
+    background: linear-gradient(135deg, rgba(238, 242, 255, 0.95) 0%, rgba(224, 231, 255, 0.7) 100%) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(199, 210, 254, 0.9) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.06) !important;
+  }
+
+  .stat-card-teal {
+    background: linear-gradient(135deg, rgba(240, 253, 250, 0.95) 0%, rgba(204, 251, 241, 0.7) 100%) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(153, 246, 228, 0.9) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 32px rgba(13, 148, 136, 0.06) !important;
+  }
+
+  .stat-card-rose {
+    background: linear-gradient(135deg, rgba(255, 241, 242, 0.95) 0%, rgba(254, 226, 226, 0.7) 100%) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(254, 205, 211, 0.9) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 32px rgba(225, 29, 72, 0.06) !important;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FAF5FF;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #DDD6FE;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #C4B5FD;
+}
+
+/* Hide browser native password reveal icon to prevent duplicate eye icons */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+input::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+}

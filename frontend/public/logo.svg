@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="favTop" x1="15" y1="20" x2="85" y2="45" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#E879F9"/>
+    </linearGradient>
+    <linearGradient id="favMid" x1="15" y1="42" x2="85" y2="67" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#22D3EE"/>
+      <stop offset="100%" stop-color="#C084FC"/>
+    </linearGradient>
+    <linearGradient id="favBot" x1="15" y1="64" x2="85" y2="89" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#A855F7"/>
+      <stop offset="100%" stop-color="#F472B6"/>
+    </linearGradient>
+    <linearGradient id="favLaser" x1="20" y1="85" x2="85" y2="15" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#C084FC"/>
+      <stop offset="40%" stop-color="#F43F5E"/>
+      <stop offset="75%" stop-color="#D946EF"/>
+      <stop offset="100%" stop-color="#38BDF8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 1. Bottom Layer -->
+  <path d="M50 62 L82 74 C86 75.5 86 78.5 82 80 L50 92 C46 93.5 44 93.5 40 92 L18 80 C14 78.5 14 75.5 18 74 L40 62 C44 60.5 46 60.5 50 62 Z" fill="#A855F7" fill-opacity="0.35" stroke="url(#favBot)" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- 2. Middle Layer -->
+  <path d="M50 40 L82 52 C86 53.5 86 56.5 82 58 L50 70 C46 71.5 44 71.5 40 70 L18 58 C14 56.5 14 53.5 18 52 L40 40 C44 38.5 46 38.5 50 40 Z" fill="#38BDF8" fill-opacity="0.4" stroke="url(#favMid)" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- 3. Top Layer -->
+  <path d="M50 18 L82 30 C86 31.5 86 34.5 82 36 L50 48 C46 49.5 44 49.5 40 48 L18 36 C14 34.5 14 31.5 18 30 L40 18 C44 16.5 46 16.5 50 18 Z" fill="#E879F9" fill-opacity="0.45" stroke="url(#favTop)" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- 4. Glowing Neon Wave -->
+  <path d="M26 86 C32 78 38 72 52 64 C66 56 68 46 54 38 C42 30 58 20 78 16" stroke="url(#favLaser)" stroke-width="8" stroke-linecap="round"/>
+  
+  <!-- 5. White Core -->
+  <path d="M26 86 C32 78 38 72 52 64 C66 56 68 46 54 38 C42 30 58 20 78 16" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+</svg>
