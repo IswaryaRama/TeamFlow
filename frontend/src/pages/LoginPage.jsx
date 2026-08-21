@@ -180,7 +180,7 @@ export default function LoginPage() {
               >
                 <div className="flex items-center space-x-1.5 text-xs font-semibold text-slate-800 group-hover:text-purple-800">
                   <Users className="w-3.5 h-3.5 text-purple-600" />
-                  <span>John (Dev)</span>
+                  <span>John</span>
                 </div>
                 <div className="text-[10px] text-slate-500 truncate">member@teamflow.com</div>
               </button>
@@ -192,7 +192,7 @@ export default function LoginPage() {
               >
                 <div className="flex items-center space-x-1.5 text-xs font-semibold text-slate-800 group-hover:text-purple-800">
                   <Users className="w-3.5 h-3.5 text-purple-600" />
-                  <span>Sarah (QA)</span>
+                  <span>Sarah</span>
                 </div>
                 <div className="text-[10px] text-slate-500 truncate">sarah@teamflow.com</div>
               </button>
@@ -204,7 +204,7 @@ export default function LoginPage() {
               >
                 <div className="flex items-center space-x-1.5 text-xs font-semibold text-slate-800 group-hover:text-purple-800">
                   <Users className="w-3.5 h-3.5 text-purple-600" />
-                  <span>Michael (DS)</span>
+                  <span>Michael</span>
                 </div>
                 <div className="text-[10px] text-slate-500 truncate">michael@teamflow.com</div>
               </button>
