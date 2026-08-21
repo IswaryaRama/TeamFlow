@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '../common/Modal';
+import ConfirmDialog from '../common/ConfirmDialog';
 import { PriorityBadge, StatusBadge, RoleBadge } from '../common/Badge';
 import { taskService } from '../../services/taskService';
 import { userService } from '../../services/userService';
@@ -67,6 +68,10 @@ export default function TaskDetailModal({
 
   // History modal state
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+
+  // Delete task state
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     if (isOpen && taskId) {
@@ -211,6 +216,20 @@ export default function TaskDetailModal({
     }
   };
 
+  const handleDeleteTask = async () => {
+    setDeleteLoading(true);
+    try {
+      await taskService.deleteTask(task.id);
+      setIsDeleteConfirmOpen(false);
+      onClose();
+      if (onTaskUpdated) onTaskUpdated();
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to delete task');
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   const formatDate = (iso) => {
     if (!iso) return 'None (No deadline)';
     const d = parseUtcDate(iso);
@@ -264,6 +283,19 @@ export default function TaskDetailModal({
                     <AlertTriangle className="w-3.5 h-3.5" />
                     <span>Overdue</span>
                   </span>
+                )}
+
+                {/* Admin Delete Task Button */}
+                {isAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => setIsDeleteConfirmOpen(true)}
+                    className="ml-auto inline-flex items-center space-x-1.5 px-3 py-1 rounded-xl text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition cursor-pointer shadow-xs"
+                    title="Delete this task permanently"
+                  >
+                    <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                    <span>Delete Task</span>
+                  </button>
                 )}
               </div>
 
@@ -586,6 +618,18 @@ export default function TaskDetailModal({
         isOpen={isHistoryModalOpen}
         onClose={() => setIsHistoryModalOpen(false)}
         task={task}
+      />
+
+      {/* Confirm Task Deletion Modal */}
+      <ConfirmDialog
+        isOpen={isDeleteConfirmOpen}
+        onClose={() => setIsDeleteConfirmOpen(false)}
+        onConfirm={handleDeleteTask}
+        title="Delete Task"
+        message={`Are you sure you want to permanently delete "${task?.title}"? All task comments and deadline change audit logs will be permanently deleted.`}
+        confirmText="Yes, Delete Task"
+        confirmVariant="danger"
+        loading={deleteLoading}
       />
     </>
   );
