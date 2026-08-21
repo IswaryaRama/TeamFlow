@@ -35,6 +35,7 @@ export default function ProjectDetailPage() {
 
   const [project, setProject] = useState(null);
   const [tasks, setTasks] = useState([]);
+  const [taskFilter, setTaskFilter] = useState(!isAdmin ? 'MINE' : 'ALL'); // 'ALL' or 'MINE'
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -303,45 +304,83 @@ export default function ProjectDetailPage() {
         </div>
 
         {/* Project Tasks */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <CheckSquare className="w-5 h-5 text-purple-600" />
-              <span>Project Tasks ({tasks.length})</span>
-            </h3>
+        {(() => {
+          const myProjectTasks = (tasks || []).filter((t) => t.assigned_to_id === user?.id);
+          const displayedTasks = taskFilter === 'MINE' ? myProjectTasks : tasks;
 
-            {isAdmin && (
-              <button
-                type="button"
-                onClick={() => setIsCreateTaskOpen(true)}
-                className="text-xs font-bold text-purple-700 hover:text-purple-900 flex items-center gap-1 cursor-pointer"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Add Task</span>
-              </button>
-            )}
-          </div>
+          return (
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center space-x-3">
+                  <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <CheckSquare className="w-5 h-5 text-purple-600" />
+                    <span>Project Tasks ({tasks.length})</span>
+                  </h3>
 
-          {tasks.length === 0 ? (
-            <div className="p-12 text-center glass-card rounded-2xl border border-purple-100 text-slate-500 text-xs shadow-xs">
-              No tasks assigned to this project yet. {isAdmin ? 'Click "Add Task" to create one.' : ''}
+                  {/* Filter Switcher for Members & Admins */}
+                  <div className="flex items-center p-0.5 rounded-xl bg-purple-50 border border-purple-200">
+                    <button
+                      type="button"
+                      onClick={() => setTaskFilter('MINE')}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                        taskFilter === 'MINE'
+                          ? 'bg-purple-600 text-white shadow-xs'
+                          : 'text-slate-600 hover:text-purple-800'
+                      }`}
+                    >
+                      My Tasks ({myProjectTasks.length})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTaskFilter('ALL')}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                        taskFilter === 'ALL'
+                          ? 'bg-purple-600 text-white shadow-xs'
+                          : 'text-slate-600 hover:text-purple-800'
+                      }`}
+                    >
+                      All Tasks ({tasks.length})
+                    </button>
+                  </div>
+                </div>
+
+                {isAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => setIsCreateTaskOpen(true)}
+                    className="text-xs font-bold text-purple-700 hover:text-purple-900 flex items-center gap-1 cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Add Task</span>
+                  </button>
+                )}
+              </div>
+
+              {displayedTasks.length === 0 ? (
+                <div className="p-12 text-center glass-card rounded-2xl border border-purple-100 text-slate-500 text-xs shadow-xs">
+                  {taskFilter === 'MINE'
+                    ? 'You have no tasks assigned to you in this project.'
+                    : 'No tasks in this project yet.'}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {displayedTasks.map((t) => (
+                    <TaskCard
+                      key={t.id}
+                      task={t}
+                      projectName={project?.title}
+                      onClick={() => {
+                        setSelectedTaskId(t.id);
+                        setIsTaskDetailOpen(true);
+                      }}
+                      onHistoryClick={(tObj) => setHistoryTask(tObj)}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {tasks.map((t) => (
-                <TaskCard
-                  key={t.id}
-                  task={t}
-                  onClick={() => {
-                    setSelectedTaskId(t.id);
-                    setIsTaskDetailOpen(true);
-                  }}
-                  onHistoryClick={(tObj) => setHistoryTask(tObj)}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+          );
+        })()}
       </div>
 
       {/* Add Member Modal */}
