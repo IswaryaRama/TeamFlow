@@ -6,14 +6,12 @@
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4+-38B2AC?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com)
 
-> **Full Stack Developer Assignment Submission** for **Zylentrix / SHE STARTS**  
-> Primary Source of Truth: Assignment Objective & Specifications.
 
 ---
 
 ## 🌟 Executive Summary
 
-**TeamFlow** is an enterprise-grade, full-stack project and task management platform. It features strict **Role-Based Access Control (RBAC)** distinguishing **Admin** and **Team Member** capabilities, real-time completion analytics, threaded progress discussions, and a dedicated **Task Deadline Audit Trail** satisfying the mandatory Additional Challenge.
+**TeamFlow** is an full-stack project and task management platform. It features strict **Role-Based Access Control (RBAC)** distinguishing **Admin** and **Team Member** capabilities, real-time completion analytics, threaded progress discussions, and a dedicated **Task Deadline Audit Trail** satisfying the mandatory Additional Challenge.
 
 ---
 
@@ -34,11 +32,11 @@
 
 ## 🛠️ Technology Stack
 
-* **Frontend**: React 18, Vite, Tailwind CSS, Axios, React Router v6, Lucide React
-* **Backend**: Python 3.12, FastAPI, SQLAlchemy 2.0 (Async ORM), Pydantic v2
-* **Database**: PostgreSQL 16 with `asyncpg` async driver
-* **Authentication**: JWT (JSON Web Tokens), `passlib` with `bcrypt`
-* **Containerization & Testing**: Docker, Docker Compose, `pytest`, `httpx`
+* **Frontend**: React 18, Vite, Tailwind CSS, Axios
+* **Backend**: Python 3.12, FastAPI
+* **Database**: PostgreSQL
+* **Authentication**: JWT (JSON Web Tokens)
+* **Containerization & Testing**: Docker, Docker Compose, `pytest`
 
 ---
 
