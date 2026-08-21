@@ -36,6 +36,7 @@ export default function ProjectDetailPage() {
   const [project, setProject] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [taskFilter, setTaskFilter] = useState(!isAdmin ? 'MINE' : 'ALL'); // 'ALL' or 'MINE'
+  const [statusFilter, setStatusFilter] = useState('ALL'); // 'ALL', 'TODO', 'IN_PROGRESS', 'IN_REVIEW', 'COMPLETED'
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -231,22 +232,65 @@ export default function ProjectDetailPage() {
           <ProgressBar percentage={progress.completion_percentage} size="md" showLabel={false} />
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-purple-100 text-center">
-            <div className="p-3 rounded-xl bg-purple-50/70 border border-purple-100">
-              <span className="text-[11px] text-slate-500 font-semibold block">To Do</span>
+            {/* To Do Card */}
+            <button
+              type="button"
+              onClick={() => setStatusFilter(statusFilter === 'TODO' ? 'ALL' : 'TODO')}
+              className={`p-3 rounded-xl border transition cursor-pointer text-center group ${
+                statusFilter === 'TODO'
+                  ? 'bg-purple-100/90 border-purple-400 ring-2 ring-purple-400 shadow-xs'
+                  : 'bg-purple-50/70 border-purple-100 hover:bg-purple-100/50 hover:border-purple-200'
+              }`}
+              title={statusFilter === 'TODO' ? 'Click to show all tasks' : 'Click to filter To Do tasks'}
+            >
+              <span className="text-[11px] text-slate-500 font-semibold block group-hover:text-purple-900">To Do</span>
               <span className="text-base font-extrabold text-slate-900">{progress.todo_tasks || 0}</span>
-            </div>
-            <div className="p-3 rounded-xl bg-purple-50/70 border border-purple-100">
-              <span className="text-[11px] text-purple-700 font-semibold block">In Progress</span>
+            </button>
+
+            {/* In Progress Card */}
+            <button
+              type="button"
+              onClick={() => setStatusFilter(statusFilter === 'IN_PROGRESS' ? 'ALL' : 'IN_PROGRESS')}
+              className={`p-3 rounded-xl border transition cursor-pointer text-center group ${
+                statusFilter === 'IN_PROGRESS'
+                  ? 'bg-purple-100/90 border-purple-400 ring-2 ring-purple-400 shadow-xs'
+                  : 'bg-purple-50/70 border-purple-100 hover:bg-purple-100/50 hover:border-purple-200'
+              }`}
+              title={statusFilter === 'IN_PROGRESS' ? 'Click to show all tasks' : 'Click to filter In Progress tasks'}
+            >
+              <span className="text-[11px] text-purple-700 font-semibold block group-hover:text-purple-950">In Progress</span>
               <span className="text-base font-extrabold text-purple-900">{progress.in_progress_tasks || 0}</span>
-            </div>
-            <div className="p-3 rounded-xl bg-purple-50/70 border border-purple-100">
-              <span className="text-[11px] text-indigo-700 font-semibold block">In Review</span>
+            </button>
+
+            {/* In Review Card */}
+            <button
+              type="button"
+              onClick={() => setStatusFilter(statusFilter === 'IN_REVIEW' ? 'ALL' : 'IN_REVIEW')}
+              className={`p-3 rounded-xl border transition cursor-pointer text-center group ${
+                statusFilter === 'IN_REVIEW'
+                  ? 'bg-indigo-100/90 border-indigo-400 ring-2 ring-indigo-400 shadow-xs'
+                  : 'bg-purple-50/70 border-purple-100 hover:bg-purple-100/50 hover:border-purple-200'
+              }`}
+              title={statusFilter === 'IN_REVIEW' ? 'Click to show all tasks' : 'Click to filter In Review tasks'}
+            >
+              <span className="text-[11px] text-indigo-700 font-semibold block group-hover:text-indigo-950">In Review</span>
               <span className="text-base font-extrabold text-indigo-900">{progress.in_review_tasks || 0}</span>
-            </div>
-            <div className="p-3 rounded-xl bg-purple-50/70 border border-purple-100">
-              <span className="text-[11px] text-emerald-700 font-semibold block">Completed</span>
+            </button>
+
+            {/* Completed Card */}
+            <button
+              type="button"
+              onClick={() => setStatusFilter(statusFilter === 'COMPLETED' ? 'ALL' : 'COMPLETED')}
+              className={`p-3 rounded-xl border transition cursor-pointer text-center group ${
+                statusFilter === 'COMPLETED'
+                  ? 'bg-emerald-100/90 border-emerald-400 ring-2 ring-emerald-400 shadow-xs'
+                  : 'bg-purple-50/70 border-purple-100 hover:bg-purple-100/50 hover:border-purple-200'
+              }`}
+              title={statusFilter === 'COMPLETED' ? 'Click to show all tasks' : 'Click to filter Completed tasks'}
+            >
+              <span className="text-[11px] text-emerald-700 font-semibold block group-hover:text-emerald-950">Completed</span>
               <span className="text-base font-extrabold text-emerald-900">{progress.completed_tasks || 0}</span>
-            </div>
+            </button>
           </div>
         </div>
 
@@ -273,40 +317,72 @@ export default function ProjectDetailPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {project.members?.map((m) => (
-              <div
-                key={m.id}
-                className="p-3.5 rounded-xl bg-white/80 border border-purple-100 flex items-center justify-between group shadow-xs hover:border-purple-300 transition"
-              >
-                <div className="flex items-center space-x-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-purple-100 text-purple-800 border border-purple-200 font-bold flex items-center justify-center text-xs">
-                    {m.user?.full_name?.charAt(0) || 'U'}
+            {project.members?.map((m) => {
+              const mTasks = (tasks || []).filter((t) => t.assigned_to_id === m.user?.id);
+              const mCompleted = mTasks.filter((t) => t.status === 'COMPLETED').length;
+              const mTotal = mTasks.length;
+              const mPct = mTotal > 0 ? Math.round((mCompleted / mTotal) * 100) : 0;
+
+              return (
+                <div
+                  key={m.id}
+                  className="p-3.5 rounded-xl bg-white/90 border border-purple-100 flex flex-col justify-between space-y-3 group shadow-xs hover:border-purple-300 hover:shadow-sm transition"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center space-x-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-purple-100 text-purple-800 border border-purple-200 font-bold flex items-center justify-center text-xs flex-shrink-0">
+                        {m.user?.full_name?.charAt(0) || 'U'}
+                      </div>
+                      <div className="truncate">
+                        <div className="text-xs font-bold text-slate-900 truncate">{m.user?.full_name}</div>
+                        <RoleBadge role={m.user?.role} />
+                      </div>
+                    </div>
+
+                    {isAdmin && m.user?.id !== project.created_by_id && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveMember(m.user?.id)}
+                        className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-rose-600 transition cursor-pointer"
+                        title="Remove from project"
+                      >
+                        <UserX className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                   </div>
-                  <div>
-                    <div className="text-xs font-bold text-slate-900">{m.user?.full_name}</div>
-                    <RoleBadge role={m.user?.role} />
+
+                  {/* Individual Member Progress */}
+                  <div className="space-y-1 pt-2 border-t border-purple-50">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-slate-500 font-medium">
+                        {mTotal === 0 ? 'No tasks' : `${mCompleted}/${mTotal} tasks done`}
+                      </span>
+                      <span className={`font-bold ${mPct === 100 ? 'text-emerald-700' : 'text-purple-800'}`}>
+                        {mPct}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-purple-50 rounded-full h-1.5 overflow-hidden border border-purple-100">
+                      <div
+                        className={`h-full rounded-full transition-all duration-300 ${
+                          mPct === 100 ? 'bg-emerald-500' : 'bg-purple-600'
+                        }`}
+                        style={{ width: `${mPct}%` }}
+                      />
+                    </div>
                   </div>
                 </div>
-
-                {isAdmin && m.user?.id !== project.created_by_id && (
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveMember(m.user?.id)}
-                    className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-rose-600 transition cursor-pointer"
-                    title="Remove from project"
-                  >
-                    <UserX className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
         {/* Project Tasks */}
         {(() => {
           const myProjectTasks = (tasks || []).filter((t) => t.assigned_to_id === user?.id);
-          const displayedTasks = taskFilter === 'MINE' ? myProjectTasks : tasks;
+          let displayedTasks = taskFilter === 'MINE' ? myProjectTasks : tasks;
+          if (statusFilter !== 'ALL') {
+            displayedTasks = displayedTasks.filter((t) => t.status === statusFilter);
+          }
 
           return (
             <div className="space-y-4">
