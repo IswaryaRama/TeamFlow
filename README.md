@@ -187,8 +187,8 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 | Role | Email | Password | Identifier |
 |---|---|---|---|
 | **Admin** | `admin@teamflow.com` | `AdminPass123!` | `admin` |
-| **Team Member** | `member@teamflow.com` | `MemberPass123!` | `john_dev` |
-| **Team Member 2** | `sarah@teamflow.com` | `MemberPass123!` | `sarah_qa` |
+| **Team Member** | `member@teamflow.com` | `MemberPass123!` | `john` |
+| **Team Member 2** | `sarah@teamflow.com` | `MemberPass123!` | `sarah` |
 
 *(The login page includes 1-click demo login buttons for instant access).*
 
