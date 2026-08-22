@@ -11,7 +11,7 @@
 
 ## 🌟 Executive Summary
 
-**TeamFlow** is an full-stack project and task management platform. It features strict **Role-Based Access Control (RBAC)** distinguishing **Admin** and **Team Member** capabilities, real-time completion analytics, threaded progress discussions, and a dedicated **Task Deadline Audit Trail** satisfying the mandatory Additional Challenge.
+**TeamFlow** is an full-stack project and task management platform. It features strict **Role-Based Access Control (RBAC)** distinguishing **Admin** and **Team Member** capabilities, dynamic project completion and workload analytics, and a dedicated **Task Deadline Audit Trail**.
 
 ---
 
