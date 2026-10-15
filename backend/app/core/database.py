@@ -10,17 +10,12 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy import event
 from app.core.config import settings
 
-# Engine configuration
 engine_args = {
     "echo": settings.ENVIRONMENT == "development",
     "future": True,
 }
 
-if settings.DATABASE_URL.startswith("sqlite"):
-    # SQLite configuration
-    pass
-else:
-    # PostgreSQL connection configuration
+if not settings.DATABASE_URL.startswith("sqlite"):
     engine_args["pool_pre_ping"] = True
     engine_args["connect_args"] = {"ssl": "require"}
 
@@ -29,8 +24,8 @@ async_engine = create_async_engine(
     **engine_args,
 )
 
-# Enable SQLite foreign keys
 if settings.DATABASE_URL.startswith("sqlite"):
+
     @event.listens_for(async_engine.sync_engine, "connect")
     def set_sqlite_pragma(dbapi_connection, connection_record):
         try:
@@ -40,7 +35,7 @@ if settings.DATABASE_URL.startswith("sqlite"):
         except Exception:
             pass
 
-# Create session maker
+
 AsyncSessionLocal = async_sessionmaker(
     bind=async_engine,
     class_=AsyncSession,
@@ -49,7 +44,6 @@ AsyncSessionLocal = async_sessionmaker(
     autoflush=False,
 )
 
-# Declarative Base
 Base = declarative_base()
 
 
